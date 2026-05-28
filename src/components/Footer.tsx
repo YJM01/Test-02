@@ -1,12 +1,15 @@
 import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Send, Sparkles, Check, Phone, Shield } from 'lucide-react';
+import { LOCATION_DATA } from '../types';
 
 interface FooterProps {
   onNavigate: (sectionId: string) => void;
+  selectedLocation?: 'miami' | 'doral';
 }
 
-export default function Footer({ onNavigate }: FooterProps) {
+export default function Footer({ onNavigate, selectedLocation = 'miami' }: FooterProps) {
+  const currentLoc = LOCATION_DATA[selectedLocation];
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -44,7 +47,7 @@ export default function Footer({ onNavigate }: FooterProps) {
               <span className="text-3xl transition-transform duration-500 group-hover:rotate-12 select-none">🍋</span>
               <div>
                 <h3 className="font-serif text-2xl font-bold tracking-wider text-white">Limoncello</h3>
-                <p className="text-[9px] uppercase tracking-widest text-[#f5f2e6]/50">Miami Beach Fine Dining</p>
+                <p className="text-[9px] uppercase tracking-widest text-[#f5f2e6]/50">{currentLoc.slogan}</p>
               </div>
             </div>
 
@@ -164,9 +167,9 @@ export default function Footer({ onNavigate }: FooterProps) {
           </div>
 
           <div className="flex gap-4">
-            <span>1334 Washington Ave., Miami Beach, FL, 33139</span>
+            <span>{currentLoc.address}</span>
             <span>•</span>
-            <a href="tel:3053978226" className="hover:text-white transition-colors">(305) 397-8226</a>
+            <a href={`tel:${currentLoc.phoneRaw}`} className="hover:text-white transition-colors">{currentLoc.phone}</a>
           </div>
         </div>
 

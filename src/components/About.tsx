@@ -1,11 +1,15 @@
 import { motion } from 'motion/react';
 import { Sparkles, Award, Heart, Shield } from 'lucide-react';
+import { LOCATION_DATA } from '../types';
 
 interface AboutProps {
   onNavigate: (sectionId: string) => void;
+  selectedLocation?: 'miami' | 'doral';
 }
 
-export default function About({ onNavigate }: AboutProps) {
+export default function About({ onNavigate, selectedLocation = 'miami' }: AboutProps) {
+  const currentLoc = LOCATION_DATA[selectedLocation];
+
   const values = [
     {
       icon: <Sparkles className="w-5 h-5 text-limon-gold" />,
@@ -20,7 +24,7 @@ export default function About({ onNavigate }: AboutProps) {
     {
       icon: <Heart className="w-5 h-5 text-limon-gold" />,
       title: 'Mediterranean Love',
-      text: 'Uniting traditional recipes passed through centuries with modern aesthetics and Miami Beach vitality.'
+      text: `Uniting traditional recipes passed through centuries with modern aesthetics and ${currentLoc.name} vitality.`
     }
   ];
 
@@ -110,13 +114,13 @@ export default function About({ onNavigate }: AboutProps) {
               <span className="text-xs font-bold tracking-[0.3em] uppercase text-limon-olive block">Our Heritage</span>
               <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-limon-dark leading-tight" id="about-title">
                 The Romance of the South, <br />
-                <span className="italic text-limon-gold font-medium">Breathed in Miami</span>
+                <span className="italic text-limon-gold font-medium">Breathed in {currentLoc.name}</span>
               </h2>
               <div className="w-16 h-1 bg-limon-gold/40 rounded" />
             </div>
 
             <p className="text-limon-dark/80 text-base leading-relaxed font-light">
-              Founded on the belief that fine dining is a theater of senses, <strong className="font-semibold text-limon-dark">Limoncello</strong> brings Amalfi’s legendary culinary romance directly to the shores of Miami Beach. We marry authentic flavors of Campania and Apulia with the vibrant energy of coastal Florida.
+              Founded on the belief that fine dining is a theater of senses, <strong className="font-semibold text-limon-dark">Limoncello</strong> brings Amalfi’s legendary culinary romance directly to {currentLoc.fullName}. We marry authentic flavors of Campania and Apulia with the vibrant energy of coastal Florida.
             </p>
 
             <blockquote className="border-l-4 border-limon-gold pl-4 italic text-limon-muted py-2 font-serif text-lg bg-limon-beige/40 rounded-r-xl pr-3">

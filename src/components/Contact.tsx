@@ -1,8 +1,15 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapPin, Phone, Mail, Clock, Send, ShieldCheck, Sparkles } from 'lucide-react';
+import { LOCATION_DATA } from '../types';
 
-export default function Contact() {
+interface ContactProps {
+  selectedLocation?: 'miami' | 'doral';
+}
+
+export default function Contact({ selectedLocation = 'miami' }: ContactProps) {
+  const currentLoc = LOCATION_DATA[selectedLocation];
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -66,14 +73,16 @@ export default function Contact() {
     }, 1200);
   };
 
-  const hoursList = [
-    { day: 'Monday', hours: '12:00 PM – 11:45 PM' },
-    { day: 'Tuesday', hours: '12:00 PM – 11:45 PM' },
-    { day: 'Wednesday', hours: '12:00 PM – 11:45 PM' },
-    { day: 'Thursday', hours: '12:00 PM – 11:45 PM' },
-    { day: 'Friday', hours: '12:00 PM – 11:45 PM' },
-    { day: 'Saturday', hours: '12:00 PM – 11:45 PM' },
-    { day: 'Sunday', hours: '12:00 PM – 11:45 PM' }
+  const hoursList = selectedLocation === 'miami' ? [
+    { day: 'Mon - Thu', hours: '5:00 PM – 10:30 PM' },
+    { day: 'Friday', hours: '5:00 PM – 11:30 PM' },
+    { day: 'Saturday', hours: '5:00 PM – 11:30 PM' },
+    { day: 'Sunday', hours: '5:00 PM – 10:30 PM' }
+  ] : [
+    { day: 'Mon - Thu', hours: '4:30 PM – 10:00 PM' },
+    { day: 'Friday', hours: '4:30 PM – 11:00 PM' },
+    { day: 'Saturday', hours: '4:30 PM – 11:00 PM' },
+    { day: 'Sunday', hours: '4:30 PM – 10:00 PM' }
   ];
 
   return (
@@ -88,7 +97,7 @@ export default function Contact() {
           </h2>
           <div className="w-20 h-[1px] bg-gradient-to-r from-transparent via-limon-gold to-transparent mx-auto" />
           <p className="text-xs sm:text-sm text-limon-muted font-light leading-relaxed">
-            Planning a visit to our historic venue on Washington Avenue? View our opening hours, send a concierge message, or get directions.
+            Planning a visit to our {currentLoc.fullName}? View our opening hours, send a concierge message, or get directions.
           </p>
         </div>
 
@@ -110,8 +119,7 @@ export default function Contact() {
                   <div>
                     <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-limon-dark">Located at</h4>
                     <p className="text-xs font-light text-limon-muted leading-relaxed mt-1">
-                      1334 Washington Ave. <br />
-                      Miami Beach, FL, 33139
+                      {currentLoc.address}
                     </p>
                   </div>
                 </div>
@@ -124,10 +132,10 @@ export default function Contact() {
                   <div>
                     <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-limon-dark">Direct Lines</h4>
                     <p className="text-xs font-semibold text-limon-dark mt-1">
-                      <a href="tel:3053978226" className="hover:text-limon-gold transition-colors">(305) 397-8226</a>
+                      <a href={`tel:${currentLoc.phoneRaw}`} className="hover:text-limon-gold transition-colors">{currentLoc.phone}</a>
                     </p>
                     <p className="text-[10px] text-limon-muted mt-0.5">
-                      <a href="mailto:concierge@limoncellomiami.com" className="hover:underline">concierge@limoncellomiami.com</a>
+                      <a href={`mailto:concierge@limoncello${selectedLocation}.com`} className="hover:underline">concierge@limoncello{selectedLocation}.com</a>
                     </p>
                   </div>
                 </div>
@@ -156,14 +164,17 @@ export default function Contact() {
             <div className="rounded-2xl overflow-hidden border border-limon-cream shadow-premium h-64 relative group">
               <iframe
                 title="Limoncello Italian Restaurant Google Map Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3592.5188806253457!2d-80.13327668497858!3d25.784813583626245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b48f9dcba1bf%3A0xe5f9b96495db3793!2s1334%20Washington%20Ave%2C%20Miami%20Beach%2C%20FL%2033139!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+                src={selectedLocation === 'miami' 
+                  ? "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3592.5188806253457!2d-80.13327668497858!3d25.784813583626245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b48f9dcba1bf%3A0xe5f9b96495db3793!2s1334%20Washington%20Ave%2C%20Miami%20Beach%2C%20FL%2033139!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+                  : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3591.222302302345!2d-80.33924772497746!3d25.806622833621455!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9be7cd05809bb%3A0xe758dfa73ecd831d!2s8700%20NW%2036th%20St%2C%20Doral%2C%20FL%2033166!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+                }
                 className="w-full h-full border-0 grayscale saturate-50 contrast-125 focus:outline-none"
                 allowFullScreen={true}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
               <div className="absolute bottom-3 left-3 bg-[#1e1f1a]/95 text-white px-3 py-1.5 rounded-lg text-[9px] tracking-widest uppercase font-semibold border border-white/10 pointer-events-none group-hover:scale-95 transition-transform duration-300">
-                🗺️ Washington Avenue Parking Available
+                🗺️ {selectedLocation === 'miami' ? 'Washington Avenue Parking Available' : 'Ample Estate Valet & Parking'}
               </div>
             </div>
 

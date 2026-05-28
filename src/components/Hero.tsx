@@ -1,11 +1,15 @@
 import { motion } from 'motion/react';
 import { Calendar, UtensilsCrossed, ChevronDown } from 'lucide-react';
+import { LOCATION_DATA } from '../types';
 
 interface HeroProps {
   onNavigate: (sectionId: string) => void;
+  selectedLocation: 'miami' | 'doral';
 }
 
-export default function Hero({ onNavigate }: HeroProps) {
+export default function Hero({ onNavigate, selectedLocation }: HeroProps) {
+  const currentLoc = LOCATION_DATA[selectedLocation];
+
   // Config for the floating lemons
   const floatingLemons = [
     { id: 1, scale: 0.8, x: '-20%', y: '15%', delay: 0, rotate: -15, size: 'text-5xl sm:text-7xl' },
@@ -22,7 +26,7 @@ export default function Hero({ onNavigate }: HeroProps) {
       {/* Cinematic Ambiance Image Background with Darken & Warm gold overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=1920"
+          src={currentLoc.bgHeroUrl}
           alt="Limoncello Dinner Ambiance"
           className="w-full h-full object-cover object-center opacity-45 scale-105"
           style={{ filter: 'contrast(1.05) brightness(0.85) sepia(0.05)' }}
@@ -84,7 +88,7 @@ export default function Hero({ onNavigate }: HeroProps) {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-xs uppercase tracking-[0.4em] text-limon-yellow font-bold mb-4"
         >
-          Miami Beach Fine Dining
+          {currentLoc.slogan}
         </motion.p>
 
         {/* Huge Headline: Limoncello */}
@@ -106,7 +110,7 @@ export default function Hero({ onNavigate }: HeroProps) {
           transition={{ duration: 1.2, delay: 0.5 }}
           className="font-serif text-xl sm:text-2xl md:text-3xl text-limon-cream tracking-wide italic mb-6 font-light opacity-90"
         >
-          An Authentic Italian Experience in the heart of Miami Beach.
+          An Authentic Italian Experience in the heart of {currentLoc.name}.
         </motion.h2>
 
         {/* Horizontal gold separator line with diamonds */}
@@ -126,7 +130,7 @@ export default function Hero({ onNavigate }: HeroProps) {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="text-base sm:text-lg md:text-xl text-neutral-300 font-light max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Experience the true taste of Italy in the heart of Miami Beach. Masterfully crafted handmade pastas, hand-poured wines, and Mediterranean breeze.
+          {currentLoc.description} Masterfully crafted handmade pastas, hand-poured wines, and Mediterranean breeze.
         </motion.p>
 
         {/* Action Button Links */}
@@ -138,10 +142,10 @@ export default function Hero({ onNavigate }: HeroProps) {
         >
           <button
             onClick={() => onNavigate('menu')}
-            className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-limon-cream hover:border-limon-yellow text-limon-cream font-medium text-sm uppercase tracking-widest rounded-full hover:bg-limon-cream hover:text-limon-dark transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group shadow-premium"
+            className="w-full sm:w-auto px-8 py-4 bg-white text-limon-dark font-semibold text-xs uppercase tracking-[2px] rounded-full hover:bg-limon-yellow hover:text-limon-dark transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group shadow-premium hover:scale-105 active:scale-95"
             id="hero-menu-cta"
           >
-            <UtensilsCrossed className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            <UtensilsCrossed className="w-4 h-4 text-limon-gold group-hover:text-limon-dark group-hover:rotate-12 transition-transform duration-300" />
             <span>Explore Menu</span>
           </button>
 

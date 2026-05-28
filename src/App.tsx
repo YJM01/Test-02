@@ -16,9 +16,16 @@ import Footer from './components/Footer';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Dynamic persistent branch choice
+  const [selectedLocation, setSelectedLocation] = useState<'miami' | 'doral' | null>(() => {
+    const saved = localStorage.getItem('limon_location');
+    return (saved === 'miami' || saved === 'doral') ? saved : null;
+  });
+
   const [currentPage, setCurrentPage] = useState<'home' | 'menu' | 'book-table' | 'contact'>('home');
 
-  // 1. SPLASH SCREEN DISPLAY TIMER (Pre-cooling animation)
+  // SPLASH SCREEN DISPLAY TIMER
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -26,7 +33,18 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 2. SMOOTH PAGE NAVIGATION & TRANSITION SCROLLER
+  const handleSelectLocation = (loc: 'miami' | 'doral') => {
+    localStorage.setItem('limon_location', loc);
+    setSelectedLocation(loc);
+  };
+
+  const handleClearLocation = () => {
+    localStorage.removeItem('limon_location');
+    setSelectedLocation(null);
+    setCurrentPage('home');
+  };
+
+  // SMOOTH PAGE NAVIGATION & TRANSITION SCROLLER
   const handleScrollToSection = (sectionId: string) => {
     // Map section/page IDs to target full page state
     let targetPage: 'home' | 'menu' | 'book-table' | 'contact' = 'home';
@@ -79,7 +97,7 @@ export default function App() {
             key="splash-loader"
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, scale: 0.96 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 z-50 bg-[#1e1f1a] flex flex-col items-center justify-center text-white"
           >
@@ -113,7 +131,7 @@ export default function App() {
                 transition={{ delay: 0.5, duration: 0.8 }}
                 className="text-[10px] uppercase tracking-[0.35em] text-limon-yellow font-semibold mb-6"
               >
-                Miami Beach Florida
+                Fine Italian Dining
               </motion.p>
 
               {/* Subtle gold loader bar */}
@@ -131,6 +149,160 @@ export default function App() {
               </span>
             </div>
           </motion.div>
+        ) : !selectedLocation ? (
+          /* --- LUXURY LOCATION SELECTOR LANDING SCREEN --- */
+          <motion.div
+            key="location-picker"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="min-h-screen bg-[#FAF9F6] flex flex-col justify-between items-center py-12 px-4 relative overflow-hidden"
+          >
+            {/* Decorative faint background graphics */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] aspect-square rounded-full bg-limon-yellow/5 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] aspect-square rounded-full bg-limon-gold/5 blur-3xl pointer-events-none" />
+
+            {/* Header / Intro */}
+            <div className="text-center max-w-xl mx-auto space-y-4 relative z-10 pt-4">
+              <motion.div
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.1 }}
+                className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white border border-limon-gold/15 shadow-premium group cursor-pointer"
+              >
+                <span className="text-3xl select-none group-hover:rotate-12 transition-transform duration-300">🍋</span>
+              </motion.div>
+              <motion.h1
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="font-serif text-3.5xl sm:text-5xl font-light tracking-[0.25em] text-limon-dark uppercase"
+              >
+                Limoncello
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="text-[10px] uppercase tracking-[0.35em] text-limon-olive font-bold"
+              >
+                An Authentic Italian Dining Experience
+              </motion.p>
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="w-16 h-[1px] bg-limon-gold/30 mx-auto"
+              />
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="text-xs text-limon-muted font-light tracking-wide max-w-sm mx-auto"
+              >
+                Choose your preferred branch to preview the exclusive culinary assemblies, somatic cellars, and reservation books.
+              </motion.p>
+            </div>
+
+            {/* Options container */}
+            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 my-10 relative z-10">
+              
+              {/* OPTION 1: MIAMI BEACH */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                whileHover={{ y: -6 }}
+                onClick={() => handleSelectLocation('miami')}
+                className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-limon-gold/15 shadow-premium hover:shadow-gold-heavy transition-all duration-500 flex flex-col justify-between h-[360px] relative"
+              >
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1200" 
+                    alt="Miami Beach Location" 
+                    className="w-full h-full object-cover object-center scale-100 group-hover:scale-110 transition-transform duration-700 opacity-20 group-hover:opacity-30 filter sepia-[0.1]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-white/10" />
+                </div>
+
+                <div className="relative z-10 p-8 flex flex-col justify-between h-full">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-limon-gold bg-limon-soft border border-limon-gold/10 px-2.5 py-1 rounded">Oceanfront Salon</span>
+                      <span className="text-xl">🌴</span>
+                    </div>
+                    <h2 className="font-serif text-2xl sm:text-3.5xl font-bold text-limon-dark mt-6 tracking-wide group-hover:text-limon-gold transition-colors duration-300">
+                      Miami Beach
+                    </h2>
+                    <p className="text-xs text-limon-muted font-light mt-2 max-w-xs leading-relaxed">
+                      Nestled in the historic Art Deco heart of Washington Avenue. Elegant seaside breezes, vibrant coastal energy, and late-night alfresco garden spirits.
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[9px] font-mono uppercase text-limon-olive tracking-widest mb-3">
+                      📍 1334 Washington Ave, Miami Beach, FL
+                    </p>
+                    <div className="w-full py-3.5 bg-limon-gold text-white font-semibold text-xs uppercase tracking-[2px] rounded-full text-center group-hover:bg-limon-dark transition-colors duration-300 shadow-premium">
+                      Enter Miami Beach Salon
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* OPTION 2: DORAL ESTATE */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                whileHover={{ y: -6 }}
+                onClick={() => handleSelectLocation('doral')}
+                className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-limon-gold/15 shadow-premium hover:shadow-gold-heavy transition-all duration-500 flex flex-col justify-between h-[360px] relative"
+              >
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=1200" 
+                    alt="Doral Estate Location" 
+                    className="w-full h-full object-cover object-center scale-100 group-hover:scale-110 transition-transform duration-700 opacity-20 group-hover:opacity-30 filter sepia-[0.1]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-white/10" />
+                </div>
+
+                <div className="relative z-10 p-8 flex flex-col justify-between h-full">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-limon-gold bg-limon-soft border border-limon-gold/10 px-2.5 py-1 rounded">Resort Country Club</span>
+                      <span className="text-xl">⛳</span>
+                    </div>
+                    <h2 className="font-serif text-2xl sm:text-3.5xl font-bold text-limon-dark mt-6 tracking-wide group-hover:text-limon-gold transition-colors duration-300">
+                      Doral Estate
+                    </h2>
+                    <p className="text-xs text-limon-muted font-light mt-2 max-w-xs leading-relaxed">
+                      Overlooking luxurious resort garden verandas. A stately country club atmosphere, premium private dinner reserves, and family lounge tranquility.
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[9px] font-mono uppercase text-limon-olive tracking-widest mb-3">
+                      📍 8700 NW 36th St, Doral, FL 33166
+                    </p>
+                    <div className="w-full py-3.5 bg-limon-gold text-white font-semibold text-xs uppercase tracking-[2px] rounded-full text-center group-hover:bg-limon-dark transition-colors duration-300 shadow-premium">
+                      Enter Doral Estate Salon
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
+
+            {/* Branded footer */}
+            <div className="text-center relative z-10 pt-2 pb-2">
+              <p className="text-[9px] uppercase tracking-[0.3em] text-[#A69F88]">
+                Limoncello Authentic Italian fine dining • Michelin Level Hospitality
+              </p>
+            </div>
+          </motion.div>
         ) : (
           /* --- FULL PREMIUM APP WITH ENHANCED FADE AND GLOW --- */
           <motion.div
@@ -141,7 +313,12 @@ export default function App() {
             className="min-h-screen bg-limon-soft text-limon-dark font-sans overflow-x-hidden selection:bg-limon-yellow/30 selection:text-limon-dark"
           >
             {/* 1. Global Translucent Header */}
-            <Navbar onNavigate={handleScrollToSection} activeSection={currentPage} />
+            <Navbar 
+              onNavigate={handleScrollToSection} 
+              activeSection={currentPage} 
+              selectedLocation={selectedLocation} 
+              onChangeLocation={handleSelectLocation} 
+            />
 
             {/* Container for pages with dynamic slide & opacity page transitions */}
             <AnimatePresence mode="wait">
@@ -154,10 +331,10 @@ export default function App() {
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
                   {/* Cinematic Hero Screen */}
-                  <Hero onNavigate={handleScrollToSection} />
+                  <Hero onNavigate={handleScrollToSection} selectedLocation={selectedLocation} />
 
                   {/* Mediterranean Storyteller */}
-                  <About onNavigate={handleScrollToSection} />
+                  <About onNavigate={handleScrollToSection} selectedLocation={selectedLocation} />
 
                   {/* Critic and Guest Testimonials */}
                   <Testimonials />
@@ -191,7 +368,7 @@ export default function App() {
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
                   {/* Direct Table Reservation Form and confirmation details */}
-                  <BookTable />
+                  <BookTable selectedLocation={selectedLocation} />
                 </motion.div>
               )}
 
@@ -205,16 +382,16 @@ export default function App() {
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
                   {/* Maps, Call Line and inquiries Contact details form */}
-                  <Contact />
+                  <Contact selectedLocation={selectedLocation} />
 
                   {/* Gorgeous Social Mosaic collage highlights */}
-                  <InstagramGallery />
+                  <InstagramGallery selectedLocation={selectedLocation} />
                 </motion.div>
               )}
             </AnimatePresence>
 
             {/* 10. Branded Sitemap and Newsletter Footer */}
-            <Footer onNavigate={handleScrollToSection} />
+            <Footer onNavigate={handleScrollToSection} selectedLocation={selectedLocation} />
           </motion.div>
         )}
       </AnimatePresence>

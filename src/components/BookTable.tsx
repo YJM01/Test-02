@@ -1,9 +1,15 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, Users, Clock, Flame, Sparkles, CheckCircle2, Phone, HelpCircle } from 'lucide-react';
-import { ReservationData } from '../types';
+import { ReservationData, LOCATION_DATA } from '../types';
 
-export default function BookTable() {
+interface BookTableProps {
+  selectedLocation?: 'miami' | 'doral';
+}
+
+export default function BookTable({ selectedLocation = 'miami' }: BookTableProps) {
+  const currentLoc = LOCATION_DATA[selectedLocation];
+
   const [formData, setFormData] = useState<ReservationData>({
     name: '',
     email: '',
@@ -125,7 +131,7 @@ export default function BookTable() {
                 <span className="text-3xl">🍋</span>
                 <div>
                   <h3 className="font-serif text-lg font-bold tracking-wide">Limoncello</h3>
-                  <p className="text-[8px] uppercase tracking-widest text-[#facc15] font-semibold">Fine Dining Miami</p>
+                  <p className="text-[8px] uppercase tracking-widest text-[#facc15] font-semibold">{currentLoc.slogan}</p>
                 </div>
               </div>
 
@@ -139,7 +145,7 @@ export default function BookTable() {
                 <div>
                   <h4 className="font-serif text-base font-bold text-limon-yellow italic">Larger Bookings</h4>
                   <p className="text-xs text-neutral-300 font-light mt-1.5 leading-relaxed">
-                    For groups larger than 10, call our concierge desk directly at <a href="tel:3053978226" className="font-semibold text-white hover:text-limon-gold hover:underline">(305) 397-8226</a>.
+                    For groups larger than 10, call our concierge desk directly at <a href={`tel:${currentLoc.phoneRaw}`} className="font-semibold text-white hover:text-limon-gold hover:underline">{currentLoc.phone}</a>.
                   </p>
                 </div>
               </div>
@@ -147,10 +153,10 @@ export default function BookTable() {
 
             <div className="relative z-10 pt-8 border-t border-white/5 space-y-3">
               <p className="text-[10px] text-neutral-400 tracking-wider">
-                📍 1334 Washington Ave, Miami Beach, FL 33139
+                📍 {currentLoc.address}
               </p>
               <p className="text-[10px] text-neutral-400 tracking-wider">
-                ⏰ Monday - Sunday: 12:00 PM - 11:45 PM
+                ⏰ {currentLoc.hours}
               </p>
             </div>
           </div>

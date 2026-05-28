@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Phone, Calendar, Globe } from 'lucide-react';
+import { LOCATION_DATA } from '../types';
 
 interface NavbarProps {
   onNavigate: (sectionId: string) => void;
   activeSection: string;
+  selectedLocation: 'miami' | 'doral';
+  onChangeLocation: (location: 'miami' | 'doral') => void;
 }
 
-export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
+export default function Navbar({ onNavigate, activeSection, selectedLocation, onChangeLocation }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,6 +39,8 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
     onNavigate(id);
   };
 
+  const currentLoc = LOCATION_DATA[selectedLocation];
+
   return (
     <>
       <header
@@ -48,21 +54,65 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
           <div className="flex items-center justify-between">
             {/* Logo side */}
             <div 
-              onClick={() => handleLinkClick('home')}
-              className="flex items-center gap-2 cursor-pointer group"
+              className="flex items-center gap-2 group"
               id="brand-logo"
             >
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-limon-cream transition-transform duration-500 group-hover:rotate-12">
+              <div 
+                onClick={() => handleLinkClick('home')}
+                className="relative flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 hover:bg-limon-beige transition-all duration-500 group-hover:rotate-12 cursor-pointer border border-[#D4AF37]/20"
+              >
                 <span className="text-2xl select-none" role="img" aria-label="lemon">🍋</span>
                 <div className="absolute -inset-0.5 rounded-full border border-limon-yellow/40 animate-pulse" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-serif text-xl sm:text-2xl font-light tracking-[2px] uppercase text-limon-dark group-hover:text-limon-gold transition-colors duration-300">
+
+              {/* Dynamic Location trigger */}
+              <div className="flex flex-col relative" onClick={(e) => e.stopPropagation()}>
+                <span 
+                  onClick={() => handleLinkClick('home')}
+                  className="font-serif text-xl sm:text-2xl font-light tracking-[2px] uppercase text-limon-dark hover:text-limon-gold transition-colors duration-300 cursor-pointer"
+                >
                   Limoncello
                 </span>
-                <span className="text-[9px] uppercase tracking-[0.25em] text-limon-olive font-medium -mt-1">
-                  Miami Beach
-                </span>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] hover:text-[#333333] font-bold -mt-1.5 flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <span>{currentLoc.name}</span>
+                    <span className="text-[6px] transition-transform duration-300" style={{ transform: showDropdown ? 'rotate(180deg)' : 'none' }}>▼</span>
+                  </button>
+
+                  <AnimatePresence>
+                    {showDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        className="absolute left-0 mt-1 bg-white/95 backdrop-blur-md rounded-xl p-2 border border-limon-gold/15 shadow-xl min-w-[140px] z-50 text-left"
+                      >
+                        <div className="text-[7px] text-neutral-400 tracking-[0.1em] uppercase px-3 py-1 font-bold">Select Branch</div>
+                        <button
+                          onClick={() => {
+                            onChangeLocation('miami');
+                            setShowDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wider rounded-lg transition-colors ${selectedLocation === 'miami' ? 'bg-[#FCF4D4] text-[#333333]' : 'hover:bg-[#FAF9F6] text-neutral-600'}`}
+                        >
+                          Miami Beach
+                        </button>
+                        <button
+                          onClick={() => {
+                            onChangeLocation('doral');
+                            setShowDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wider rounded-lg transition-colors mt-1 ${selectedLocation === 'doral' ? 'bg-[#FCF4D4] text-[#333333]' : 'hover:bg-[#FAF9F6] text-neutral-600'}`}
+                        >
+                          Doral Estate
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
 
@@ -91,12 +141,12 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
             {/* Direct Dial Call & Reservation CTA Actions */}
             <div className="hidden lg:flex items-center space-x-4">
               <a
-                href="tel:3053978226"
+                href={`tel:${currentLoc.phoneRaw}`}
                 className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-limon-olive hover:text-limon-gold transition-colors duration-300"
                 id="call-nav-button"
               >
                 <Phone className="w-3.5 h-3.5" />
-                <span>(305) 397-8226</span>
+                <span>{currentLoc.phone}</span>
               </a>
 
               <button
@@ -113,7 +163,7 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
             {/* Mobile Navigation Trigger Button */}
             <div className="flex items-center gap-3 md:hidden">
               <a
-                href="tel:3053978226"
+                href={`tel:${currentLoc.phoneRaw}`}
                 className="p-2.5 rounded-full bg-limon-cream hover:bg-limon-yellow/20 text-limon-olive transition-colors cursor-pointer"
                 id="mobile-phone-nav"
                 aria-label="Call Restaurant"
@@ -157,7 +207,25 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
                   <span className="text-3xl">🍋</span>
                   <div>
                     <h3 className="font-serif text-lg font-bold">Limoncello</h3>
-                    <p className="text-[8px] uppercase tracking-widest text-[#5f6b43]">Miami Beach Fine Dining</p>
+                    <p className="text-[8px] uppercase tracking-widest text-[#5f6b43]">{currentLoc.slogan}</p>
+                  </div>
+                </div>
+
+                <div className="mb-6 bg-white p-3 rounded-xl border border-limon-gold/15">
+                  <p className="text-[8px] uppercase tracking-widest text-neutral-400 font-bold mb-2">Switch Location</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => onChangeLocation('miami')}
+                      className={`flex-1 py-1.5 rounded text-[9px] uppercase font-bold text-center border transition-all ${selectedLocation === 'miami' ? 'bg-[#FCF4D4] border-limon-gold text-limon-dark' : 'bg-transparent border-neutral-200 text-neutral-500'}`}
+                    >
+                      Miami
+                    </button>
+                    <button
+                      onClick={() => onChangeLocation('doral')}
+                      className={`flex-1 py-1.5 rounded text-[9px] uppercase font-bold text-center border transition-all ${selectedLocation === 'doral' ? 'bg-[#FCF4D4] border-limon-gold text-limon-dark' : 'bg-transparent border-neutral-200 text-neutral-500'}`}
+                    >
+                      Doral
+                    </button>
                   </div>
                 </div>
 
@@ -180,12 +248,12 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
 
               <div className="space-y-4 pb-10">
                 <a
-                  href="tel:3053978226"
+                  href={`tel:${currentLoc.phoneRaw}`}
                   className="flex items-center justify-center gap-2 w-full py-3 border border-[#5f6b43]/20 rounded-full text-sm font-semibold tracking-wider uppercase text-[#5f6b43] bg-limon-beige hover:bg-limon-cream transition-all"
                   id="mobile-drawer-call"
                 >
                   <Phone className="w-4 h-4 animate-bounce" />
-                  <span>Call (305) 397-8226</span>
+                  <span>Call {currentLoc.phone}</span>
                 </a>
 
                 <button
@@ -196,8 +264,8 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
                   Reserve A Table
                 </button>
 
-                <div className="text-center text-[10px] text-limon-muted tracking-widest mt-4">
-                  1334 WASHINGTON AVE, MIAMI BEACH, FL
+                <div className="text-center text-[10px] text-limon-muted tracking-widest mt-4 uppercase">
+                  {currentLoc.address}
                 </div>
               </div>
             </motion.div>
@@ -207,3 +275,4 @@ export default function Navbar({ onNavigate, activeSection }: NavbarProps) {
     </>
   );
 }
+

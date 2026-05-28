@@ -2,10 +2,15 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Heart, MessageCircle, Eye, Share2, Sparkles } from 'lucide-react';
 import { INSTAGRAM_POSTS } from '../data';
-import { InstagramPost } from '../types';
+import { InstagramPost, LOCATION_DATA } from '../types';
 
-export default function InstagramGallery() {
+interface InstagramProps {
+  selectedLocation?: 'miami' | 'doral';
+}
+
+export default function InstagramGallery({ selectedLocation = 'miami' }: InstagramProps) {
   const [selectedPost, setSelectedPost] = useState<InstagramPost | null>(null);
+  const currentLoc = LOCATION_DATA[selectedLocation];
 
   return (
     <section id="instagram" className="py-24 sm:py-32 bg-limon-soft relative overflow-hidden">
@@ -19,7 +24,7 @@ export default function InstagramGallery() {
           </h2>
           <div className="w-20 h-[1px] bg-gradient-to-r from-transparent via-limon-gold to-transparent mx-auto" />
           <p className="text-xs sm:text-sm text-limon-muted font-light leading-relaxed">
-            Witness the culinary spectacles, candlelit proposals, and dynamic spritz cocktail moments shared by our guests on South Beach.
+            Witness the culinary spectacles, candlelit proposals, and dynamic spritz cocktail moments shared by our guests at our {currentLoc.fullName}.
           </p>
         </div>
 
@@ -116,8 +121,8 @@ export default function InstagramGallery() {
                     <div className="flex gap-3 items-center border-b border-limon-beige pb-4">
                       <span className="text-2xl">🍋</span>
                       <div>
-                        <h4 className="font-serif font-bold text-sm tracking-wide">limoncellomiami</h4>
-                        <p className="text-[9px] uppercase tracking-widest text-limon-olive">Miami Beach, Florida</p>
+                        <h4 className="font-serif font-bold text-sm tracking-wide">{selectedLocation === 'miami' ? 'limoncellomiami' : 'limoncellodoral'}</h4>
+                        <p className="text-[9px] uppercase tracking-widest text-limon-olive">{currentLoc.name}, Florida</p>
                       </div>
                     </div>
 
@@ -127,7 +132,7 @@ export default function InstagramGallery() {
                         {selectedPost.caption}
                       </p>
                       <p className="text-[10px] font-bold text-limon-gold font-mono">
-                        #MiamiBeachFoodies #Limoncello #PositanoPlates
+                        {selectedLocation === 'miami' ? '#MiamiBeachFoodies #Limoncello #PositanoPlates' : '#DoralFoodies #LimoncelloEstate #LuxuryDining'}
                       </p>
                     </div>
                   </div>
