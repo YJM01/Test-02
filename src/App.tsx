@@ -175,41 +175,11 @@ export default function App() {
             transition={{ duration: 0.6 }}
             className="min-h-screen bg-[#111111] flex flex-col relative overflow-hidden"
           >
-            {/* Elegant Header Overlay */}
-            <div className="absolute top-0 inset-x-0 z-40 bg-gradient-to-b from-black/90 via-black/50 to-transparent pt-12 pb-24 px-6 pointer-events-none">
-              <div className="max-w-7xl mx-auto flex flex-col items-center justify-center text-center space-y-3">
-                <motion.div
-                  initial={{ y: -15, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2, duration: 0.8 }}
-                  className="flex items-center gap-1.5 bg-[#D4AF37]/15 border border-[#D4AF37]/30 px-3.5 py-1.5 rounded-full backdrop-blur-md"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#FAD13B] animate-pulse" />
-                  <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-[#FCF4D4] font-mono">Select Location</span>
-                </motion.div>
-                <motion.h1
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.8 }}
-                  className="font-serif text-3.5xl sm:text-5.5xl font-extralight tracking-[0.25em] text-white uppercase"
-                >
-                  Limoncello
-                </motion.h1>
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                  className="w-24 h-[1px] bg-[#D4AF37]/40"
-                />
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6, duration: 1 }}
-                  className="text-xs sm:text-sm text-neutral-300 font-light tracking-[0.08em] max-w-md mt-1"
-                >
-                  Step into our culinary theater. Please select a salon to begin your journey.
-                </motion.p>
-              </div>
+            {/* Elegant Minimalist Header Overlay */}
+            <div className="absolute top-12 left-0 right-0 z-40 flex justify-center pointer-events-none">
+              <span className="font-serif text-3.5xl sm:text-4.5xl tracking-[0.35em] font-extralight text-white uppercase select-none">
+                Limoncello
+              </span>
             </div>
 
             {/* Split Panels Container */}
