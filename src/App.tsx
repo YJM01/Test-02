@@ -16,13 +16,8 @@ import Footer from './components/Footer';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Dynamic persistent branch choice
-  const [selectedLocation, setSelectedLocation] = useState<'miami' | 'doral' | null>(() => {
-    const saved = localStorage.getItem('limon_location');
-    return (saved === 'miami' || saved === 'doral') ? saved : null;
-  });
-
+  const [selectedLocation, setSelectedLocation] = useState<'miami' | 'doral' | null>(null);
+  const [hoveredPanel, setHoveredPanel] = useState<'miami' | 'doral' | null>(null);
   const [currentPage, setCurrentPage] = useState<'home' | 'menu' | 'book-table' | 'contact'>('home');
 
   // SPLASH SCREEN DISPLAY TIMER
@@ -33,14 +28,35 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Force clean state resetted to select-location on initial refresh/load
+  useEffect(() => {
+    setSelectedLocation(null);
+    window.history.replaceState(null, '', '/select-location');
+
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/miami-beach') {
+        setSelectedLocation('miami');
+      } else if (path === '/doral') {
+        setSelectedLocation('doral');
+      } else {
+        setSelectedLocation(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleSelectLocation = (loc: 'miami' | 'doral') => {
-    localStorage.setItem('limon_location', loc);
     setSelectedLocation(loc);
+    const path = loc === 'miami' ? '/miami-beach' : '/doral';
+    window.history.pushState(null, '', path);
+    setCurrentPage('home');
   };
 
   const handleClearLocation = () => {
-    localStorage.removeItem('limon_location');
     setSelectedLocation(null);
+    window.history.pushState(null, '', '/select-location');
     setCurrentPage('home');
   };
 
@@ -155,152 +171,175 @@ export default function App() {
             key="location-picker"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="min-h-screen bg-[#FAF9F6] flex flex-col justify-between items-center py-12 px-4 relative overflow-hidden"
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.6 }}
+            className="min-h-screen bg-[#111111] flex flex-col relative overflow-hidden"
           >
-            {/* Decorative faint background graphics */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] aspect-square rounded-full bg-limon-yellow/5 blur-3xl pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] aspect-square rounded-full bg-limon-gold/5 blur-3xl pointer-events-none" />
-
-            {/* Header / Intro */}
-            <div className="text-center max-w-xl mx-auto space-y-4 relative z-10 pt-4">
-              <motion.div
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.1 }}
-                className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white border border-limon-gold/15 shadow-premium group cursor-pointer"
-              >
-                <span className="text-3xl select-none group-hover:rotate-12 transition-transform duration-300">🍋</span>
-              </motion.div>
-              <motion.h1
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-serif text-3.5xl sm:text-5xl font-light tracking-[0.25em] text-limon-dark uppercase"
-              >
-                Limoncello
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-[10px] uppercase tracking-[0.35em] text-limon-olive font-bold"
-              >
-                An Authentic Italian Dining Experience
-              </motion.p>
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="w-16 h-[1px] bg-limon-gold/30 mx-auto"
-              />
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                className="text-xs text-limon-muted font-light tracking-wide max-w-sm mx-auto"
-              >
-                Choose your preferred branch to preview the exclusive culinary assemblies, somatic cellars, and reservation books.
-              </motion.p>
+            {/* Elegant Header Overlay */}
+            <div className="absolute top-0 inset-x-0 z-40 bg-gradient-to-b from-black/90 via-black/50 to-transparent pt-12 pb-24 px-6 pointer-events-none">
+              <div className="max-w-7xl mx-auto flex flex-col items-center justify-center text-center space-y-3">
+                <motion.div
+                  initial={{ y: -15, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.8 }}
+                  className="flex items-center gap-1.5 bg-[#D4AF37]/15 border border-[#D4AF37]/30 px-3.5 py-1.5 rounded-full backdrop-blur-md"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#FAD13B] animate-pulse" />
+                  <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-[#FCF4D4] font-mono">Select Location</span>
+                </motion.div>
+                <motion.h1
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.8 }}
+                  className="font-serif text-3.5xl sm:text-5.5xl font-extralight tracking-[0.25em] text-white uppercase"
+                >
+                  Limoncello
+                </motion.h1>
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                  className="w-24 h-[1px] bg-[#D4AF37]/40"
+                />
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 1 }}
+                  className="text-xs sm:text-sm text-neutral-300 font-light tracking-[0.08em] max-w-md mt-1"
+                >
+                  Step into our culinary theater. Please select a salon to begin your journey.
+                </motion.p>
+              </div>
             </div>
 
-            {/* Options container */}
-            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 my-10 relative z-10">
+            {/* Split Panels Container */}
+            <div className="flex-1 flex flex-col md:flex-row min-h-screen relative w-full overflow-hidden">
               
-              {/* OPTION 1: MIAMI BEACH */}
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                whileHover={{ y: -6 }}
+              {/* PANEL 1: MIAMI BEACH */}
+              <div
+                onMouseEnter={() => setHoveredPanel('miami')}
+                onMouseLeave={() => setHoveredPanel(null)}
                 onClick={() => handleSelectLocation('miami')}
-                className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-limon-gold/15 shadow-premium hover:shadow-gold-heavy transition-all duration-500 flex flex-col justify-between h-[360px] relative"
+                style={{
+                  transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1)'
+                }}
+                className={`group cursor-pointer relative overflow-hidden flex flex-col justify-end p-8 sm:p-12 md:p-16 h-[50vh] md:h-auto ${
+                  hoveredPanel === 'miami' ? 'md:w-[56%]' : hoveredPanel === 'doral' ? 'md:w-[44%]' : 'md:w-1/2'
+                } w-full`}
               >
-                <div className="absolute inset-0 z-0 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1200" 
-                    alt="Miami Beach Location" 
-                    className="w-full h-full object-cover object-center scale-100 group-hover:scale-110 transition-transform duration-700 opacity-20 group-hover:opacity-30 filter sepia-[0.1]"
+                {/* Background image & overlays */}
+                <div className="absolute inset-0 z-0">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-black/30 z-5 group-hover:bg-black/10 transition-colors duration-500" />
+                  {/* Gentle golden bloom on hover */}
+                  <div className="absolute inset-0 bg-[#D4AF37]/5 mix-blend-color-dodge opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10 pointer-events-none" />
+                  <img
+                    src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=1200"
+                    alt="Limoncello Miami Beach"
+                    className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-[1.2s] ease-out filter brightness-[0.85]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-white/10" />
                 </div>
 
-                <div className="relative z-10 p-8 flex flex-col justify-between h-full">
-                  <div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-limon-gold bg-limon-soft border border-limon-gold/10 px-2.5 py-1 rounded">Oceanfront Salon</span>
-                      <span className="text-xl">🌴</span>
-                    </div>
-                    <h2 className="font-serif text-2xl sm:text-3.5xl font-bold text-limon-dark mt-6 tracking-wide group-hover:text-limon-gold transition-colors duration-300">
+                {/* Content */}
+                <div className="relative z-20 text-white space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-limon-yellow bg-black/50 border border-limon-yellow/20 px-2.5 py-1 rounded backdrop-blur-sm shadow-sm inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-limon-yellow animate-ping" /> Oceanfront Salon
+                    </span>
+                    <span className="text-xs text-neutral-400 font-mono tracking-wider hidden sm:inline">25.7848° N, 80.1332° W</span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <h2 className="font-serif text-3xl sm:text-4.5xl md:text-5.5xl font-bold tracking-wide group-hover:text-limon-yellow transition-colors duration-300">
                       Miami Beach
                     </h2>
-                    <p className="text-xs text-limon-muted font-light mt-2 max-w-xs leading-relaxed">
-                      Nestled in the historic Art Deco heart of Washington Avenue. Elegant seaside breezes, vibrant coastal energy, and late-night alfresco garden spirits.
+                    <p className="text-xs text-neutral-300 font-light max-w-sm tracking-wide leading-relaxed">
+                      Deeply seated in the historic Art Deco pulse on Washington Avenue. Experience oceanfront elegance, authentic Campanian hand-stretched pasta, and romantic candlelit garden seating.
                     </p>
                   </div>
 
-                  <div>
-                    <p className="text-[9px] font-mono uppercase text-limon-olive tracking-widest mb-3">
-                      📍 1334 Washington Ave, Miami Beach, FL
-                    </p>
-                    <div className="w-full py-3.5 bg-limon-gold text-white font-semibold text-xs uppercase tracking-[2px] rounded-full text-center group-hover:bg-limon-dark transition-colors duration-300 shadow-premium">
-                      Enter Miami Beach Salon
+                  <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+                    <div className="space-y-0.5 text-neutral-400">
+                      <p className="font-semibold text-white uppercase tracking-widest text-[9px] flex items-center gap-1">📍 Beachfront Residence</p>
+                      <p className="text-[10px]">1334 Washington Ave, Miami Beach, FL</p>
+                    </div>
+                    <div className="w-full sm:w-auto py-2.5 px-6 rounded-full border border-white/20 bg-white/10 group-hover:bg-limon-yellow group-hover:text-black group-hover:border-limon-yellow text-center font-bold uppercase tracking-[2px] text-[10px] transition-all duration-300 whitespace-nowrap shadow-premium">
+                      Enter Miami Beach
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
-              {/* OPTION 2: DORAL ESTATE */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                whileHover={{ y: -6 }}
+              {/* PANEL 2: DORAL ESTATE */}
+              <div
+                onMouseEnter={() => setHoveredPanel('doral')}
+                onMouseLeave={() => setHoveredPanel(null)}
                 onClick={() => handleSelectLocation('doral')}
-                className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-limon-gold/15 shadow-premium hover:shadow-gold-heavy transition-all duration-500 flex flex-col justify-between h-[360px] relative"
+                style={{
+                  transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1)'
+                }}
+                className={`group cursor-pointer relative overflow-hidden flex flex-col justify-end p-8 sm:p-12 md:p-16 h-[50vh] md:h-auto border-t md:border-t-0 md:border-l border-white/10 ${
+                  hoveredPanel === 'doral' ? 'md:w-[56%]' : hoveredPanel === 'miami' ? 'md:w-[44%]' : 'md:w-1/2'
+                } w-full`}
               >
-                <div className="absolute inset-0 z-0 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=1200" 
-                    alt="Doral Estate Location" 
-                    className="w-full h-full object-cover object-center scale-100 group-hover:scale-110 transition-transform duration-700 opacity-20 group-hover:opacity-30 filter sepia-[0.1]"
+                {/* Background image & overlays */}
+                <div className="absolute inset-0 z-0">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-black/30 z-5 group-hover:bg-black/10 transition-colors duration-500" />
+                  {/* Gentle golden bloom on hover */}
+                  <div className="absolute inset-0 bg-[#D4AF37]/5 mix-blend-color-dodge opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10 pointer-events-none" />
+                  <img
+                    src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=1200"
+                    alt="Limoncello Doral Estate"
+                    className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-[1.2s] ease-out filter brightness-[0.85]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-white/10" />
                 </div>
 
-                <div className="relative z-10 p-8 flex flex-col justify-between h-full">
-                  <div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-limon-gold bg-limon-soft border border-limon-gold/10 px-2.5 py-1 rounded">Resort Country Club</span>
-                      <span className="text-xl">⛳</span>
-                    </div>
-                    <h2 className="font-serif text-2xl sm:text-3.5xl font-bold text-limon-dark mt-6 tracking-wide group-hover:text-limon-gold transition-colors duration-300">
+                {/* Content */}
+                <div className="relative z-20 text-white space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-limon-yellow bg-black/50 border border-limon-yellow/20 px-2.5 py-1 rounded backdrop-blur-sm shadow-sm inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-limon-yellow animate-ping" /> Resort Country Club
+                    </span>
+                    <span className="text-xs text-neutral-400 font-mono tracking-wider hidden sm:inline">25.8066° N, 80.3392° W</span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <h2 className="font-serif text-3xl sm:text-4.5xl md:text-5.5xl font-bold tracking-wide group-hover:text-limon-yellow transition-colors duration-300">
                       Doral Estate
                     </h2>
-                    <p className="text-xs text-limon-muted font-light mt-2 max-w-xs leading-relaxed">
-                      Overlooking luxurious resort garden verandas. A stately country club atmosphere, premium private dinner reserves, and family lounge tranquility.
+                    <p className="text-xs text-neutral-300 font-light max-w-sm tracking-wide leading-relaxed">
+                      A majestic country-club estate garden surrounded by mature lemon verandas. Savor vintage reserve wine cellars, classic masonry styling, and true tranquil luxury.
                     </p>
                   </div>
 
-                  <div>
-                    <p className="text-[9px] font-mono uppercase text-limon-olive tracking-widest mb-3">
-                      📍 8700 NW 36th St, Doral, FL 33166
-                    </p>
-                    <div className="w-full py-3.5 bg-limon-gold text-white font-semibold text-xs uppercase tracking-[2px] rounded-full text-center group-hover:bg-limon-dark transition-colors duration-300 shadow-premium">
-                      Enter Doral Estate Salon
+                  <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+                    <div className="space-y-0.5 text-neutral-400">
+                      <p className="font-semibold text-white uppercase tracking-widest text-[9px] flex items-center gap-1">📍 Estate Pergola</p>
+                      <p className="text-[10px]">8700 NW 36th St, Doral, FL 33166</p>
+                    </div>
+                    <div className="w-full sm:w-auto py-2.5 px-6 rounded-full border border-white/20 bg-white/10 group-hover:bg-limon-yellow group-hover:text-black group-hover:border-limon-yellow text-center font-bold uppercase tracking-[2px] text-[10px] transition-all duration-300 whitespace-nowrap shadow-premium">
+                      Enter Doral Estate
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
-            </div>
+              {/* Center Floating Premium Brand Divider (Desktop Only) */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none hidden md:flex items-center justify-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="w-28 h-28 rounded-full bg-white text-[#333333] border-4 border-[#D4AF37] flex flex-col items-center justify-center shadow-gold-heavy relative"
+                >
+                  <span className="text-3xl select-none animate-pulse">🍋</span>
+                  <span className="font-serif text-[10px] uppercase font-bold tracking-[0.2em] mt-1.5 text-[#5f6b43]">Select Salon</span>
+                  {/* Concentric rotating glowing ring */}
+                  <div className="absolute -inset-3 border border-dashed border-[#D4AF37]/20 rounded-full animate-[spin_24s_linear_infinite]" />
+                </motion.div>
+              </div>
 
-            {/* Branded footer */}
-            <div className="text-center relative z-10 pt-2 pb-2">
-              <p className="text-[9px] uppercase tracking-[0.3em] text-[#A69F88]">
-                Limoncello Authentic Italian fine dining • Michelin Level Hospitality
-              </p>
             </div>
           </motion.div>
         ) : (
