@@ -16,7 +16,10 @@ import Footer from './components/Footer';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedLocation, setSelectedLocation] = useState<'miami' | 'doral' | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<'miami' | 'doral' | null>(() => {
+    const saved = sessionStorage.getItem('limon_session_location');
+    return (saved === 'miami' || saved === 'doral') ? saved : null;
+  });
   const [hoveredPanel, setHoveredPanel] = useState<'miami' | 'doral' | null>(null);
   const [currentPage, setCurrentPage] = useState<'home' | 'menu' | 'book-table' | 'contact'>('home');
 
@@ -28,19 +31,33 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Force clean state resetted to select-location on initial refresh/load
+  // Force clean state resetted to select-location on initial refresh/load if no session is set
   useEffect(() => {
-    setSelectedLocation(null);
-    window.history.replaceState(null, '', '/select-location');
+    const saved = sessionStorage.getItem('limon_session_location');
+    if (saved === 'miami' || saved === 'doral') {
+      setSelectedLocation(saved as 'miami' | 'doral');
+      const expectedPath = saved === 'miami' ? '/miami-beach' : '/doral';
+      if (window.location.pathname !== expectedPath) {
+        window.history.replaceState(null, '', expectedPath);
+      }
+    } else {
+      setSelectedLocation(null);
+      if (window.location.pathname !== '/select-location') {
+        window.history.replaceState(null, '', '/select-location');
+      }
+    }
 
     const handlePopState = () => {
       const path = window.location.pathname;
       if (path === '/miami-beach') {
         setSelectedLocation('miami');
+        sessionStorage.setItem('limon_session_location', 'miami');
       } else if (path === '/doral') {
         setSelectedLocation('doral');
+        sessionStorage.setItem('limon_session_location', 'doral');
       } else {
         setSelectedLocation(null);
+        sessionStorage.removeItem('limon_session_location');
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -48,6 +65,7 @@ export default function App() {
   }, []);
 
   const handleSelectLocation = (loc: 'miami' | 'doral') => {
+    sessionStorage.setItem('limon_session_location', loc);
     setSelectedLocation(loc);
     const path = loc === 'miami' ? '/miami-beach' : '/doral';
     window.history.pushState(null, '', path);
@@ -55,6 +73,7 @@ export default function App() {
   };
 
   const handleClearLocation = () => {
+    sessionStorage.removeItem('limon_session_location');
     setSelectedLocation(null);
     window.history.pushState(null, '', '/select-location');
     setCurrentPage('home');
@@ -323,21 +342,6 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Center Floating Premium Brand Divider (Desktop Only) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none hidden md:flex items-center justify-center">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.8 }}
-                  className="w-28 h-28 rounded-full bg-white text-[#333333] border-4 border-[#D4AF37] flex flex-col items-center justify-center shadow-gold-heavy relative"
-                >
-                  <span className="text-3xl select-none animate-pulse">🍋</span>
-                  <span className="font-serif text-[10px] uppercase font-bold tracking-[0.2em] mt-1.5 text-[#5f6b43]">Select Salon</span>
-                  {/* Concentric rotating glowing ring */}
-                  <div className="absolute -inset-3 border border-dashed border-[#D4AF37]/20 rounded-full animate-[spin_24s_linear_infinite]" />
-                </motion.div>
               </div>
 
             </div>
