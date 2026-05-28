@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Georgia", serif;
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --color-limon-soft: #FAF9F6;     /* Artistic Flair Ivory White Backdrop */
+  --color-limon-beige: #FCF4D4;    /* Soft golden warm selection background */
+  --color-limon-cream: rgba(212, 175, 55, 0.15);    /* Gold leaf border / glass shine tint */
+  --color-limon-yellow: #FAD13B;   /* Vibrant Lemon-accent Yellow */
+  --color-limon-gold: #D4AF37;     /* Bright Signature Gold Accent */
+  --color-limon-olive: #5f6b43;    /* Mediterranean olive green accent */
+  --color-limon-dark: #333333;     /* True charcoal artistic ink */
+  --color-limon-muted: #666666;    /* Exact text-muted gray */
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+  background-color: var(--color-limon-soft);
+  color: var(--color-limon-dark);
+}
+
+/* Elegant gold leaf cursor glow and scrollbar options */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #fbfaf5;
+}
+::-webkit-scrollbar-thumb {
+  background: #c4a04d;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9d7d35;
+}
+
+/* Luxury card shadow */
+.shadow-premium {
+  box-shadow: 0 10px 40px -15px rgba(95, 107, 67, 0.1);
+}
+
+.shadow-gold-heavy {
+  box-shadow: 0 20px 50px -10px rgba(196, 160, 77, 0.2);
+}
+
+.glow-lemon {
+  filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.35));
+}
+

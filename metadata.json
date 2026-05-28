@@ -1,0 +1,6 @@
+{
+  "name": "Limoncello Miami",
+  "description": "Premium modern responsive restaurant website for Limoncello – An Authentic Italian Restaurant in Miami Beach. Warm, luxurious, lemon-themed design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
